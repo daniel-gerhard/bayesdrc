@@ -17,7 +17,8 @@ bdrm.formula <- function(formula, data, family, model){
 }
 
 
-test <- data.frame(response = c(1, 2, 3, 4), dose=c(4, 3, 2, 1))
+test <- data.frame(response = c(1, 2, 3, 4), 
+                   dose = c(4, 3, 2, 1))
 bdrm(response ~ dose, data=test, family="gaussian")
 
 
@@ -26,5 +27,8 @@ logistic <- function(fixed=c(NA, NA, NA, NA, NA),
                      prior.sd=c(),
                      lwr=c(-Inf, -Inf, -Inf, -Inf, -Inf),
                      upr=c(Inf, Inf, Inf, Inf, Inf)){
-  
+
+  fct <- function(x, beta) beta[2] + (beta[3]-beta[2])/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
+  mod <- list(fct, prior.mu, prior.sd, lwr, upr)
+  return(mod)
 }
