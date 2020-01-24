@@ -45,7 +45,7 @@ test <- data.frame(response = rnorm(length(dose), model$fct(dose, model$prior.mu
                    dose=dose)
 plot(response ~ dose, data=test)
 bdrm(response ~ dose, data=test)
-iter <- 100
+iter <- 1000
 startval <- c(10, 0, 1, 0.5, 1)
 x <- test$dose
 y <- test$response
@@ -90,11 +90,20 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
         } else {
           bn <- bo
         }
+        if (i %in% seq(100, iter, by=100)){ 
+          if (accept[k,j]/100 < 0.4) jsd[j] <- jsd[j]*0.95
+          if (accept[k,j]/100 > 0.55) jsd[j] <- jsd[j]*1.05
+          print(accept[k,])
+          accept[k,j] <- 0
+        }
       }
       avar[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(x, y, bo))
       apm[i,,k] <- bn
     }
   }
+  accept/iter
+  plot(apm[,1,1], type="l")
+  
   #### burnin
   #### sampling
 }
