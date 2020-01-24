@@ -69,6 +69,8 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   atau <- 0.001
   btau <- 0.001
   
+  accept <- matrix(0, nrow=chains, ncol=p)
+  
   for (k in 1:chains){
     for (i in 2:iter){
       bn <- bo <- apm[i-1,,k]
@@ -84,7 +86,7 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
         logU <- log(runif(1, 0, 1))
         if (logR > logU){
           bo <- bn
-          #accept[1] <- accept[1] + 1
+          accept[k,j] <- accept[k,j] + 1
         } else {
           bn <- bo
         }
