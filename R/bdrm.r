@@ -53,7 +53,9 @@ y <- test$response
 
 chains <- 4
 
-pm <- bdrm.fit(x, y, model, chains, iter, startval)
+pm <- bdrm.fit(x, y, model=logistic(prior.sd=c(100, 100, 100, 100, 100)), chains, iter, startval)
+plot(pm[,4,1], type="l")
+
 
 bdrm.fit <- function(x, y, model, chains, iter, startval){
   p <- length(model$fixed)
@@ -93,7 +95,11 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
         } else {
           bn <- bo
         }
-        if (i == 200) jsd[j] <- sqrt(var(apm[50:199,j,k]) * (2.4/sqrt(p))^2)
+        if (i == 200){
+          vest <- sqrt(var(apm[50:199,j,k]) * (2.4/sqrt(p))^2)
+          if (vest == 0) vest <- jsd[j] * 0.5
+          jsd[j] <- vest
+        }
         if (i %in% seq(300, aiter, by=100)){ 
           if (accept[k,j]/100 < 0.4) jsd[j] <- jsd[j]*0.95
           if (accept[k,j]/100 > 0.55) jsd[j] <- jsd[j]*1.05
