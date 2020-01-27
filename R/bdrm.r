@@ -1,8 +1,8 @@
-bdrm <- function(formula, data, model, iter){
+bdrm <- function(formula, data, model, chains, iter, startval){
   UseMethod("bdrm")
 }
 
-bdrm.formula <- function(formula, data, model, iter){
+bdrm.formula <- function(formula, data, model, chains, iter, startval){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "subset", "weights", "na.action", "offset"), names(mf), 0L)
@@ -13,7 +13,8 @@ bdrm.formula <- function(formula, data, model, iter){
   mt <- attr(mf, "terms")
   y <- model.response(mf, "numeric")
   x <- model.matrix(mt, mf)[,-1]
-  return(list(y, x))
+  pm <- bdrm.fit(x, y, model=logistic(prior.mu=c(10, 15, 2, 0.5, 1), prior.sd=c(10, 10, 10, 10, 10), lwr=c(0, -Inf, 0, 0, 0), fixed=c(NA, NA, NA, NA, 1)), chains, iter, startval)
+  return(pm)
 }
 
 
@@ -139,20 +140,33 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
 ######################################################################
 #######################################################################
 library(truncnorm)
-dose = seq(0, 1, length=5)
+dose = seq(0, 1, length=25)
 model <- logistic()
-test <- data.frame(response = rnorm(length(dose), model$fct(dose, model$prior.mu), 0.1), 
+mus <- c(10, 15, 2, 0.5, 1)
+test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1), 
                    dose=dose)
 plot(response ~ dose, data=test)
 bdrm(response ~ dose, data=test)
-aiter <- 1000
+aiter <- 10000
 iter <- 10000
-startval <- c(10, 0, 1, 0.5, 1)
+startval <- c(10, 0, 2, 0.5, 1)
 x <- test$dose
 y <- test$response
 
 chains <- 4
 
-pm <- bdrm.fit(x, y, model=logistic(prior.sd=c(1, 1, 1, 1, 1), lwr=c(0, -Inf, 0, 0, 0), fixed=c(NA, NA, NA, NA, 1)), chains, iter, startval)
+pm <- bdrm(response ~ dose, data=test, 
+           model=logistic(prior.mu=c(10, 15, 2, 0.5, 1), 
+                          prior.sd=c(10, 10, 10, 10, 10), 
+                          lwr=c(0, -Inf, 0, 0, 0), 
+                          fixed=c(NA, NA, NA, NA, 1)), 
+           chains=4, 
+           iter=10000, 
+           startval=c(10, 0, 2, 0.5, 1))
+
+par(mfrow=c(2,2))
+plot(pm[,1,1], type="l")
+plot(pm[,2,1], type="l")
 plot(pm[,3,1], type="l")
+plot(pm[,4,1], type="l")
 
