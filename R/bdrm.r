@@ -1,8 +1,8 @@
-bdrm <- function(formula, data, model, chains, iter, startval){
+bdrm <- function(formula, data, model, chains, iter, startval=NULL){
   UseMethod("bdrm")
 }
 
-bdrm.formula <- function(formula, data, model, chains, iter, startval){
+bdrm.formula <- function(formula, data, model, chains, iter, startval=NULL){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "subset", "weights", "na.action", "offset"), names(mf), 0L)
@@ -13,14 +13,14 @@ bdrm.formula <- function(formula, data, model, chains, iter, startval){
   mt <- attr(mf, "terms")
   y <- model.response(mf, "numeric")
   x <- model.matrix(mt, mf)[,-1]
-  pm <- bdrm.fit(x, y, model=logistic(prior.mu=c(10, 15, 2, 0.5, 1), prior.sd=c(10, 10, 10, 10, 10), lwr=c(0, -Inf, 0, 0, 0), fixed=c(NA, NA, NA, NA, 1)), chains, iter, startval)
+  pm <- bdrm.fit(x, y, model=model, chains=chains, iter=iter, startval=startval)
   return(pm)
 }
 
 
 logistic <- function(fixed=c(NA, NA, NA, NA, NA), 
-                     prior.mu=c(10, 15, 2, 0.5, 1),
-                     prior.sd=c(1, 1, 1, 1, 1),
+                     prior.mu=c(NA, NA, NA, NA, NA),
+                     prior.sd=c(NA, NA, NA, NA, NA),
                      lwr=c(-Inf, -Inf, -Inf, -Inf, -Inf),
                      upr=c(Inf, Inf, Inf, Inf, Inf)){
 
@@ -53,7 +53,14 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   # adaptive phase
   apm <- array(NA, dim=c(aiter, length(startval), chains))
   avar <- matrix(NA, nrow=aiter, ncol=chains)
-  startval[!is.na(fixed)] <- fixed[!is.na(fixed)]
+  if (is.null(startval)) startval <- matrix(rtruncnorm(p*chains, a=clwr, b=cupr, mean=bmu, sd=bsd), nrow=p, ncol=chains)
+  startval <- matrix(startval, nrow=p, ncol=chains)
+  if (any(!is.na(fixed))){
+    wst <- which(!is.na(fixed))
+    for (w in wst){
+      startval[w,] <- fixed[w] 
+    }
+  }
   apm[1,,] <- startval
   avar[1,] <- 1
   atau <- 0.001
@@ -162,11 +169,28 @@ pm <- bdrm(response ~ dose, data=test,
                           fixed=c(NA, NA, NA, NA, 1)), 
            chains=4, 
            iter=10000, 
-           startval=c(10, 0, 2, 0.5, 1))
+           startval=c(1, 0, 2, 0.5, 1))
 
 par(mfrow=c(2,2))
-plot(pm[,1,1], type="l")
-plot(pm[,2,1], type="l")
-plot(pm[,3,1], type="l")
-plot(pm[,4,1], type="l")
+plot(pm[,1,1], type="l", ylim=c(min(pm[,1,]), max(pm[,1,])))
+lines(pm[,1,2], col="red")
+lines(pm[,1,3], col="blue")
+lines(pm[,1,4], col="green")
 
+plot(pm[,2,1], type="l", ylim=c(min(pm[,2,]), max(pm[,2,])))
+lines(pm[,2,2], col="red")
+lines(pm[,2,3], col="blue")
+lines(pm[,2,4], col="green")
+
+plot(pm[,3,1], type="l", ylim=c(min(pm[,3,]), max(pm[,3,])))
+lines(pm[,3,2], col="red")
+lines(pm[,3,3], col="blue")
+lines(pm[,3,4], col="green")
+
+plot(pm[,4,1], type="l", ylim=c(min(pm[,4,]), max(pm[,4,])))
+lines(pm[,4,2], col="red")
+lines(pm[,4,3], col="blue")
+lines(pm[,4,4], col="green")
+
+
+pairs(pm[,1:4,1], pch=15)
