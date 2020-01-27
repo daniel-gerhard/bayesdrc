@@ -51,7 +51,7 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   ss <- model$ss
   jsd <- sqrt(bsd^2 * (2.4/sqrt(p))^2)
   # adaptive phase
-  apm <- array(NA, dim=c(aiter, length(startval), chains))
+  apm <- array(NA, dim=c(aiter, p, chains))
   avar <- matrix(NA, nrow=aiter, ncol=chains)
   if (is.null(startval)) startval <- matrix(rtruncnorm(p*chains, a=clwr, b=cupr, mean=bmu, sd=bsd), nrow=p, ncol=chains)
   startval <- matrix(startval, nrow=p, ncol=chains)
@@ -106,7 +106,7 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   }
 
   #### burnin
-  pm <- array(NA, dim=c(iter, length(startval), chains))
+  pm <- array(NA, dim=c(iter, p, chains))
   var <- matrix(NA, nrow=iter, ncol=chains)
   pm[1,,] <- apm[aiter,,]
   var[1,] <- avar[aiter,]
@@ -153,7 +153,6 @@ mus <- c(10, 15, 2, 0.5, 1)
 test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1), 
                    dose=dose)
 plot(response ~ dose, data=test)
-bdrm(response ~ dose, data=test)
 aiter <- 10000
 iter <- 10000
 startval <- c(10, 0, 2, 0.5, 1)
@@ -168,8 +167,7 @@ pm <- bdrm(response ~ dose, data=test,
                           lwr=c(0, -Inf, 0, 0, 0), 
                           fixed=c(NA, NA, NA, NA, 1)), 
            chains=4, 
-           iter=10000, 
-           startval=c(1, 0, 2, 0.5, 1))
+           iter=10000)
 
 par(mfrow=c(2,2))
 plot(pm[,1,1], type="l", ylim=c(min(pm[,1,]), max(pm[,1,])))
