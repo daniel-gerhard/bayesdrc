@@ -53,8 +53,8 @@ y <- test$response
 
 chains <- 4
 
-pm <- bdrm.fit(x, y, model=logistic(prior.sd=c(100, 100, 100, 100, 100)), chains, iter, startval)
-plot(pm[,4,1], type="l")
+pm <- bdrm.fit(x, y, model=logistic(prior.sd=c(1, 1, 1, 1, 1)), chains, iter, startval)
+plot(pm[,1,1], type="l")
 
 
 bdrm.fit <- function(x, y, model, chains, iter, startval){
