@@ -1,8 +1,8 @@
-bdrm <- function(formula, data, model, chains, iter, startval=NULL){
+bdrm <- function(formula, data, model, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
   UseMethod("bdrm")
 }
 
-bdrm.formula <- function(formula, data, model, chains, iter, startval=NULL){
+bdrm.formula <- function(formula, data, model, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "subset", "weights", "na.action", "offset"), names(mf), 0L)
@@ -13,14 +13,12 @@ bdrm.formula <- function(formula, data, model, chains, iter, startval=NULL){
   mt <- attr(mf, "terms")
   y <- model.response(mf, "numeric")
   x <- model.matrix(mt, mf)[,-1]
-  pm <- bdrm.fit(x, y, model=model, chains=chains, iter=iter, startval=startval)
+  pm <- bdrm.fit(x, y, model=model, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, startval=startval)
   return(pm)
 }
 
 
 logistic <- function(fixed=c(NA, NA, NA, NA, NA), 
-                     prior.mu=c(NA, NA, NA, NA, NA),
-                     prior.sd=c(NA, NA, NA, NA, NA),
                      lwr=c(-Inf, -Inf, -Inf, -Inf, -Inf),
                      upr=c(Inf, Inf, Inf, Inf, Inf)){
 
@@ -35,16 +33,16 @@ logistic <- function(fixed=c(NA, NA, NA, NA, NA),
     SS <- sum((y-mu)^2)
     return(SS)
   }
-  mod <- list(fct=fct, fixed=fixed, prior.mu=prior.mu, prior.sd=prior.sd, lwr=lwr, upr=upr, loglik=loglik, ss=ss)
+  mod <- list(fct=fct, fixed=fixed, lwr=lwr, upr=upr, loglik=loglik, ss=ss)
   return(mod)
 }
 
 
-bdrm.fit <- function(x, y, model, chains, iter, startval){
+bdrm.fit <- function(x, y, model, prior.mu, prior.sd, atau, btau, chains, iter, startval){
   fixed <- model$fixed
   p <- length(fixed)
-  bmu <- model$prior.mu
-  bsd <- model$prior.sd
+  bmu <- prior.mu
+  bsd <- prior.sd
   clwr <- model$lwr
   cupr <- model$upr
   loglik <- model$loglik
@@ -63,9 +61,7 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   }
   apm[1,,] <- startval
   avar[1,] <- 1
-  atau <- 0.001
-  btau <- 0.001
-  
+
   accept <- matrix(0, nrow=chains, ncol=p)
   
   for (k in 1:chains){
@@ -113,9 +109,9 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
   accept <- matrix(0, nrow=chains, ncol=p)
   
   for (k in 1:chains){
+    bn <- bo <- pm[1,,k]
+    av <- var[1,k]   
     for (i in 2:iter){
-      bn <- bo <- pm[i-1,,k]
-      av <- var[i-1,k]
       for (j in 1:p){
         if (is.na(fixed[j])){
           bn[j] <- rtruncnorm(1, a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])
@@ -134,7 +130,7 @@ bdrm.fit <- function(x, y, model, chains, iter, startval){
           }
         }
       }
-      var[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(x, y, bo))
+      av <- var[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(x, y, bo))
       pm[i,,k] <- bn
     }
   }
@@ -162,10 +158,12 @@ y <- test$response
 chains <- 4
 
 pm <- bdrm(response ~ dose, data=test, 
-           model=logistic(prior.mu=c(10, 15, 2, 0.5, 1), 
-                          prior.sd=c(10, 10, 10, 10, 10), 
-                          lwr=c(0, -Inf, 0, 0, 0), 
+           model=logistic(lwr=c(0, -Inf, 0, 0, 0), 
                           fixed=c(NA, NA, NA, NA, 1)), 
+           prior.mu=c(10, 15, 2, 0.5, 1), 
+           prior.sd=c(10, 10, 10, 10, 10), 
+           atau=0.001,
+           btau=0.001,
            chains=4, 
            iter=10000)
 
@@ -190,5 +188,3 @@ lines(pm[,4,2], col="red")
 lines(pm[,4,3], col="blue")
 lines(pm[,4,4], col="green")
 
-
-pairs(pm[,1:4,1], pch=15)
