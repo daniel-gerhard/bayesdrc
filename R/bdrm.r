@@ -45,25 +45,19 @@ logistic <- function(){
 
 
 bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, startval){
-  
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){
-    b <- sapply(1:length(model$fixed), function(i){
-      if (is.na(model$fixed[i])){
-        linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
-      } else {
-        fixed[i]
-      }
+    b <- sapply(1:length(fixed), function(i){
+      linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
     })
     return(model$fct(x, b))
   }
   
-  fixed <- model$fixed
-  p <- length(fixed)
+  p <- length(attr(linfct, which="lfid"))
   bmu <- prior.mu
   bsd <- prior.sd
-  clwr <- model$lwr
-  cupr <- model$upr
+  clwr <- lwr
+  cupr <- upr
   loglik <- model$loglik
   ss <- model$ss
   jsd <- sqrt(bsd^2 * (2.4/sqrt(p))^2)
@@ -137,8 +131,10 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
       for (j in 1:p){
         if (is.na(fixed[j])){
           bn[j] <- rtruncnorm(1, a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])
-          logR <- loglik(x, y, bn, av) - 
-            loglik(x, y, bo, av) +
+          mun <- mufct(x, bn, model, linfct)
+          muo <- mufct(x, bo, model, linfct)              
+          logR <- loglik(y, mun, av) - 
+            loglik(y, muo, av) +
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) - 
             log(dtruncnorm(bo[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) -
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])) +
@@ -152,7 +148,8 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
           }
         }
       }
-      av <- var[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(x, y, bo))
+      muo <- mufct(x, bo, model, linfct) 
+      av <- var[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
       pm[i,,k] <- bn
     }
   }
