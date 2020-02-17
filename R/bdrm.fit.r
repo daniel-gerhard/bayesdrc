@@ -1,4 +1,4 @@
-bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, startval){
+bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){
     b <- sapply(1:length(fixed), function(i){
@@ -7,6 +7,7 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
     return(model$fct(x, b))
   }
   
+  aiter <- adapt
   p <- length(attr(linfct, which="lfid"))
   bmu <- prior.mu
   bsd <- prior.sd

@@ -7,13 +7,10 @@ mus <- c(10, 15, 2, 0.5, 1)
 test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1), 
                    dose=dose)
 plot(response ~ dose, data=test)
-aiter <- 10000
-iter <- 10000
 startval <- c(10, 0, 2, 0.5, 1)
 x <- test$dose
 y <- test$response
 
-chains <- 4
 
 pm <- bdrm(response ~ dose, data=test, 
            model=logistic(), 
@@ -22,9 +19,7 @@ pm <- bdrm(response ~ dose, data=test,
            prior.mu=c(10, 15, 2, 0.5, 1), 
            prior.sd=c(10, 10, 10, 1, 0.5), 
            atau=0.001,
-           btau=0.001,
-           chains=4, 
-           iter=10000)
+           btau=0.001)
 
 
 par(mfrow=c(2,2))
