@@ -1,8 +1,8 @@
-bdrm <- function(formula, data, model, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
+bdrm <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
   UseMethod("bdrm")
 }
 
-bdrm.formula <- function(formula, data, model, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
+bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains, iter, startval=NULL){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data", "subset", "weights", "na.action", "offset"), names(mf), 0L)
@@ -13,32 +13,51 @@ bdrm.formula <- function(formula, data, model, prior.mu, prior.sd, atau=0.001, b
   mt <- attr(mf, "terms")
   y <- model.response(mf, "numeric")
   x <- model.matrix(mt, mf)[,-1]
-  pm <- bdrm.fit(x, y, model=model, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, startval=startval)
+  
+  if (is.null(fixed)) fixed <- rep(NA, model$p)
+  if (is.null(lwr)) lwr <- rep(-Inf, model$p)
+  if (is.null(upr)) upr <- rep(Inf, model$p)
+  
+  # linfct
+  if (is.null(linfct)) linfct <- lapply(1:model$p, function(i) matrix(1))
+  attr(linfct, which="lfid") <- rep(1:model$p, lapply(linfct, ncol))
+  
+  pm <- bdrm.fit(x, y, model=model, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, startval=startval)
   return(pm)
 }
 
 
-logistic <- function(fixed=c(NA, NA, NA, NA, NA), 
-                     lwr=c(-Inf, -Inf, -Inf, -Inf, -Inf),
-                     upr=c(Inf, Inf, Inf, Inf, Inf)){
-
-  fct <- function(x, beta) beta[2] + (beta[3])/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
-  loglik <- function(x, y, beta, variance){
-    mu <- fct(x, beta)
+logistic <- function(){
+  fct <- function(x, beta){
+    beta[2] + beta[3]/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
+  }
+  loglik <- function(y, mu, variance){
     LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
     return(LL)
   }
-  ss <- function(x, y, beta){
-    mu <- fct(x, beta)
+  ss <- function(y, mu){
     SS <- sum((y-mu)^2)
     return(SS)
   }
-  mod <- list(fct=fct, fixed=fixed, lwr=lwr, upr=upr, loglik=loglik, ss=ss)
+  mod <- list(fct=fct, loglik=loglik, ss=ss, p=5)
   return(mod)
 }
 
 
-bdrm.fit <- function(x, y, model, prior.mu, prior.sd, atau, btau, chains, iter, startval){
+bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, startval){
+  
+  # linfct mu fct
+  mufct <- function(x, beta, model, linfct){
+    b <- sapply(1:length(model$fixed), function(i){
+      if (is.na(model$fixed[i])){
+        linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
+      } else {
+        fixed[i]
+      }
+    })
+    return(model$fct(x, b))
+  }
+  
   fixed <- model$fixed
   p <- length(fixed)
   bmu <- prior.mu
@@ -71,8 +90,10 @@ bdrm.fit <- function(x, y, model, prior.mu, prior.sd, atau, btau, chains, iter, 
       for (j in 1:p){
         if (is.na(fixed[j])){
           bn[j] <- rtruncnorm(1, a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])
-          logR <- loglik(x, y, bn, av) - 
-            loglik(x, y, bo, av) +
+          mun <- mufct(x, bn, model, linfct)
+          muo <- mufct(x, bo, model, linfct)          
+          logR <- loglik(y, mun, av) - 
+            loglik(y, muo, av) +
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) - 
             log(dtruncnorm(bo[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) -
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])) +
@@ -96,7 +117,8 @@ bdrm.fit <- function(x, y, model, prior.mu, prior.sd, atau, btau, chains, iter, 
           }
         } 
       }
-      avar[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(x, y, bo))
+      muo <- mufct(x, bo, model, linfct) 
+      avar[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
       apm[i,,k] <- bn
     }
   }
@@ -161,7 +183,7 @@ pm <- bdrm(response ~ dose, data=test,
            model=logistic(lwr=c(0, -Inf, 0, 0, 0), 
                           fixed=c(NA, NA, NA, NA, 1)), 
            prior.mu=c(10, 15, 2, 0.5, 1), 
-           prior.sd=c(10, 10, 10, 10, 10), 
+           prior.sd=c(10, 10, 10, 1, 0.5), 
            atau=0.001,
            btau=0.001,
            chains=4, 
@@ -187,4 +209,5 @@ plot(pm[,4,1], type="l", ylim=c(min(pm[,4,]), max(pm[,4,])))
 lines(pm[,4,2], col="red")
 lines(pm[,4,3], col="blue")
 lines(pm[,4,4], col="green")
+
 
