@@ -110,5 +110,5 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
   }
   
   #### sampling
-  return(pm)
+  return(pm[-(1:burnin),,])
 }
