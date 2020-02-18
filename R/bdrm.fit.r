@@ -5,9 +5,10 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
       linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
     })
     bx <- cbind(x, b)
-    return(apply(bx, 1, function(bb) model$fct(bb[1], bb[-1]))) # special case for 1 observation - and slow!
+    pr <- apply(bx, 1, function(bb) model$fct(bb[1], bb[-1])) 
+    return(pr)
   }
-  
+
   aiter <- adapt
   p <- length(attr(linfct, which="lfid"))
   bmu <- prior.mu
