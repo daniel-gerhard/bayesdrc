@@ -12,16 +12,17 @@ x <- test$dose
 y <- test$response
 
 
-pm <- bdrm(response ~ dose, data=test, 
-           model=logistic(), 
-           fixed=c(NA, NA, NA, NA, 1),
-           lwr=c(0, -Inf, 0, 0, 0),
-           prior.mu=c(10, 15, 2, 0.5, 1), 
-           prior.sd=c(10, 10, 10, 1, 0.5), 
-           atau=0.001,
-           btau=0.001,
-           iter=10000, burnin=9000, adapt=20000)
+mod <- bdrm(response ~ dose, data=test, 
+            model=logistic(), 
+            fixed=c(NA, NA, NA, NA, 1),
+            lwr=c(0, -Inf, 0, 0, 0),
+            prior.mu=c(10, 15, 2, 0.5, 1), 
+            prior.sd=c(10, 10, 10, 1, 0.5), 
+            atau=0.001,
+            btau=0.001,
+            iter=10000, burnin=9000, adapt=20000)
 
+pm <- mod$psamples
 
 par(mfrow=c(2,2))
 plot(pm[,1,1], type="l", ylim=c(min(pm[,1,]), max(pm[,1,])))
@@ -64,17 +65,18 @@ plot(x, y)
 
 rt <- data.frame(x, y)
 
-pm <- bdrm(y ~ x, data=rt, 
-           model=logistic(), 
-           fixed=c(NA, NA, NA, NA, NA),
-           prior.mu=c(-10, 8, 0, 1, 1), 
-           prior.sd=c(10, 10, 10, 1, 0.5), 
-           upr=c(0, Inf, Inf, Inf, Inf),
-           lwr=c(-Inf, 0, 0, -Inf, 0),
-           atau=0.001,
-           btau=0.001,
-           iter=15000, burnin=10000, adapt=20000)
+mod <- bdrm(y ~ x, data=rt, 
+            model=logistic(), 
+            fixed=c(NA, NA, NA, NA, NA),
+            prior.mu=c(-10, 8, 0, 1, 1), 
+            prior.sd=c(10, 10, 10, 1, 0.5), 
+            upr=c(0, Inf, Inf, Inf, Inf),
+            lwr=c(-Inf, 0, 0, -Inf, 0),
+            atau=0.001,
+            btau=0.001,
+            iter=15000, burnin=10000, adapt=20000)
 
+pm <- mod$psamples
 
 par(mfrow=c(2,2))
 plot(pm[,1,1], type="l", ylim=c(min(pm[,1,]), max(pm[,1,])))
@@ -135,18 +137,19 @@ mm <- model.matrix(~ 1, data=spinach)
 lfct <- list(mm, mm, xm, xm, mm)
 
 
-pm <- bdrm(SLOPE ~ ldose, data=spinach,
-           model=logistic(), 
-           linfct=lfct,
-           fixed=c(NA, NA, NA, NA, NA, NA, 1),
-           prior.mu=c(-10, 0, 2, 2, 0, 0, 1), 
-           prior.sd=c(10, 10, 10, 10, 1, 1, 0.5), 
-           upr=c(0, Inf, Inf, Inf, Inf, Inf, Inf),
-           lwr=c(-Inf, 0, 0, 0, -Inf, -Inf, 0),
-           atau=0.001,
-           btau=0.001,
-           iter=15000, burnin=10000, adapt=20000)
+mod <- bdrm(SLOPE ~ ldose, data=spinach,
+            model=logistic(), 
+            linfct=lfct,
+            fixed=c(NA, NA, NA, NA, NA, NA, 1),
+            prior.mu=c(-10, 0, 2, 2, 0, 0, 1), 
+            prior.sd=c(10, 10, 10, 10, 1, 1, 0.5), 
+            upr=c(0, Inf, Inf, Inf, Inf, Inf, Inf),
+            lwr=c(-Inf, 0, 0, 0, -Inf, -Inf, 0),
+            atau=0.001,
+            btau=0.001,
+            iter=15000, burnin=10000, adapt=20000)
 
+pm <- mod$psamples
 
 par(mfrow=c(3,2))
 plot(pm[,1,1], type="l", ylim=c(min(pm[,1,]), max(pm[,1,])))

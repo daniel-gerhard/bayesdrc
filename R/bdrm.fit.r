@@ -76,14 +76,14 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
   
   #### burnin
   pm <- array(NA, dim=c(iter, p, chains))
-  var <- matrix(NA, nrow=iter, ncol=chains)
+  vm <- matrix(NA, nrow=iter, ncol=chains)
   pm[1,,] <- apm[aiter,,]
-  var[1,] <- avar[aiter,]
+  vm[1,] <- avar[aiter,]
   accept <- matrix(0, nrow=chains, ncol=p)
   
   for (k in 1:chains){
     bn <- bo <- pm[1,,k]
-    av <- var[1,k]   
+    av <- vm[1,k]   
     for (i in 2:iter){
       for (j in 1:p){
         if (is.na(fixed[j])){
@@ -106,11 +106,11 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
         }
       }
       muo <- mufct(x, bo, model, linfct) 
-      av <- var[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
+      av <- vm[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
       pm[i,,k] <- bn
     }
   }
   
   #### sampling
-  return(pm[-(1:burnin),,])
+  return(list(pm=pm[-(1:burnin),,], vm=vm[-(1:burnin),]))
 }
