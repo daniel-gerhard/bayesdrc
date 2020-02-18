@@ -1,10 +1,10 @@
 bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){
-    b <- sapply(1:length(fixed), function(i){
+    b <- sapply(1:length(linfct), function(i){
       linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
     })
-    return(model$fct(x, b))
+    return(model$fct(x, b)) # not predictions when more than 1 response
   }
   
   aiter <- adapt

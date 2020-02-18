@@ -120,3 +120,31 @@ qpr2 <- apply(pr, 1, quantile, probs=0.975)
 lines(xc, qprm)
 lines(xc, qpr1, lty=2)
 lines(xc, qpr2, lty=2)
+
+
+
+
+library(drcData)
+data(spinach)
+spinach$ldose <- log(spinach$DOSE + 0.005)
+
+plot(SLOPE ~ ldose, data=spinach)
+
+xm <- model.matrix(~ 0 + HERBICIDE, data=spinach)
+lfct <- list(matrix(1), matrix(1), xm, xm, matrix(1))
+
+
+pm <- bdrm(SLOPE ~ ldose, data=spinach,
+           model=logistic(), 
+           fixed=c(NA, NA, NA, NA, NA, NA, 1),
+           prior.mu=c(-10, 0, 2, 2, 0, 0, 1), 
+           prior.sd=c(10, 10, 10, 10, 1, 1, 0.5), 
+           upr=c(0, Inf, Inf, Inf, Inf, Inf, Inf),
+           lwr=c(-Inf, 0, 0, 0, -Inf, -Inf, 0),
+           atau=0.001,
+           btau=0.001,
+           iter=15000, burnin=10000, adapt=20000)
+
+y <- spinach$SLOPE
+x <- spinach$ldose
+
