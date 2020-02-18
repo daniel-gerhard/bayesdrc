@@ -4,7 +4,8 @@ bdrm.fit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, a
     b <- sapply(1:length(linfct), function(i){
       linfct[[i]] %*% beta[attr(linfct, which="lfid") == i]
     })
-    return(model$fct(x, b)) # not predictions when more than 1 response
+    bx <- cbind(x, b)
+    return(apply(bx, 1, function(bb) model$fct(bb[1], bb[-1]))) # special case for 1 observation - and slow!
   }
   
   aiter <- adapt
