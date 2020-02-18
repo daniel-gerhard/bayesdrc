@@ -35,7 +35,7 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
                  startval=startval,
                  psamples=postsamp$pm,
                  vsamples=postsamp$vm)
-  
+  class(result) <- "bdrm"
   return(result)
 }
 
