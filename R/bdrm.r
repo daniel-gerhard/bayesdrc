@@ -23,6 +23,7 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
   attr(linfct, which="lfid") <- rep(1:model$p, lapply(linfct, ncol))
   
   pm <- bdrm.fit(x, y, model=model, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, burnin=burnin, adapt=adapt, startval=startval)
+  
   return(pm)
 }
 
