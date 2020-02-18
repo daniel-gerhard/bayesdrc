@@ -66,13 +66,14 @@ rt <- data.frame(x, y)
 
 pm <- bdrm(y ~ x, data=rt, 
            model=logistic(), 
-           fixed=c(NA, NA, NA, NA, 1),
+           fixed=c(NA, NA, NA, NA, NA),
            prior.mu=c(-10, 8, 0, 1, 1), 
            prior.sd=c(10, 10, 10, 1, 0.5), 
            upr=c(0, Inf, Inf, Inf, Inf),
+           lwr=c(-Inf, 0, 0, -Inf, 0),
            atau=0.001,
            btau=0.001,
-           iter=10000, burnin=9000, adapt=20000)
+           iter=15000, burnin=10000, adapt=20000)
 
 
 par(mfrow=c(2,2))
@@ -108,7 +109,14 @@ gelman.diag(mcl, autoburnin=FALSE, multivariate=FALSE)
 
 xc <- seq(-2, 4, length=100)
 yc <- logistic()$fct(xc, summary(mcl)$statistics[,1])
+par(mfrow=c(1,1))
 plot(x, y)
-lines(xc, yc)
-lines(xc, logistic()$fct(xc, summary(mcl)$quantiles[,1]), lty=2)
-lines(xc, logistic()$fct(xc, summary(mcl)$quantiles[,5]), lty=2)
+
+pr <- apply(pm, c(1, 3), function(b) logistic()$fct(xc, b))
+qprm <- apply(pr, 1, quantile, probs=0.5)
+qpr1 <- apply(pr, 1, quantile, probs=0.025)
+qpr2 <- apply(pr, 1, quantile, probs=0.975)
+
+lines(xc, qprm)
+lines(xc, qpr1, lty=2)
+lines(xc, qpr2, lty=2)
