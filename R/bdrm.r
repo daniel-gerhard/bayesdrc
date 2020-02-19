@@ -25,6 +25,8 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
   
   postsamp <- bdrm.fit(x, y, model=model, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, burnin=burnin, adapt=adapt, startval=startval)
   
+  dimnames(postsamp$pm)[[2]] <- attr(linfct, which="names")
+  dimnames(postsamp$pm)[[3]] <- paste("chain", 1:chains, sep="")
   
   result <- list(model=model,
                  linfct=linfct,
@@ -35,7 +37,8 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
                  chains=chains, iter=iter, burnin=burnin, adapt=adapt,
                  startval=startval,
                  psamples=postsamp$pm,
-                 vsamples=postsamp$vm)
+                 vsamples=postsamp$vm,
+                 names=attr(linfct, which="names"))
   class(result) <- "bdrm"
   return(result)
 }
