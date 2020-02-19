@@ -21,11 +21,11 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
   # linfct
   if (is.null(linfct)) linfct <- lapply(1:model$p, function(i) model.matrix(~ 1, data=data))
   attr(linfct, which="lfid") <- rep(1:model$p, lapply(linfct, ncol))
-  attr(linfct, which="names") <- paste(model$names[attr(linfct, which="lfid")], sapply(linfct, colnames), sep=":")
+  attr(linfct, which="name") <- paste(model$names[attr(linfct, which="lfid")], sapply(linfct, colnames), sep=":")
   
   postsamp <- bdrm.fit(x, y, model=model, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, burnin=burnin, adapt=adapt, startval=startval)
   
-  dimnames(postsamp$pm)[[2]] <- attr(linfct, which="names")
+  dimnames(postsamp$pm)[[2]] <- attr(linfct, which="name")
   dimnames(postsamp$pm)[[3]] <- paste("chain", 1:chains, sep="")
   
   result <- list(model=model,
@@ -38,7 +38,7 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
                  startval=startval,
                  psamples=postsamp$pm,
                  vsamples=postsamp$vm,
-                 names=attr(linfct, which="names"))
+                 names=attr(linfct, which="name"))
   class(result) <- "bdrm"
   return(result)
 }
