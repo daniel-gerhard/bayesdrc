@@ -20,7 +20,7 @@ mod <- bdrm(response ~ dose, data=test,
             prior.sd=c(10, 10, 10, 1, 0.5), 
             atau=0.001,
             btau=0.001,
-            iter=5000, burnin=3000, adapt=10000)
+            iter=10000, burnin=8000, adapt=20000)
 
 pm <- mod$psamples
 
