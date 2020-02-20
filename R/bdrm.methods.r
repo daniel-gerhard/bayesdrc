@@ -17,3 +17,6 @@ print.bdrm <- function(x, ...){
   names(res) <- c("Mean", "SD", "2.5%", "25%", "50%", "75%", "97.5%", "Rhat")
   print(res, digits=3)
 }
+
+
+

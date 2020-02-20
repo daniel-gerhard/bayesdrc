@@ -1,6 +1,11 @@
 ######################################################################
 #######################################################################
 library(truncnorm)
+library(ggplot2)
+library(tidyr)
+
+##################################
+
 dose = seq(0, 1, length=25)
 model <- logistic()
 mus <- c(10, 15, 2, 0.5, 1)
@@ -95,4 +100,4 @@ mod <- bdrm(SLOPE ~ ldose, data=spinach,
             btau=0.001,
             iter=15000, burnin=10000, adapt=20000)
 
-
+traceplot(mod, which=1:6)

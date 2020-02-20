@@ -20,6 +20,7 @@ bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL
   
   # linfct
   if (is.null(linfct)) linfct <- lapply(1:model$p, function(i) model.matrix(~ 1, data=data))
+  if (all(unlist(lapply(linfct, function(i) inherits(i, what="formula"))))) linfct <- lapply(linfct, function(i) model.matrix(i, data=data))
   attr(linfct, which="lfid") <- rep(1:model$p, lapply(linfct, ncol))
   attr(linfct, which="name") <- paste(model$names[attr(linfct, which="lfid")], unlist(sapply(linfct, colnames)), sep=":")
   

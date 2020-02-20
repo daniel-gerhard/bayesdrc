@@ -17,3 +17,5 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
               names=names)
   return(mod)
 }
+
+
