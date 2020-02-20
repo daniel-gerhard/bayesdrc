@@ -81,23 +81,37 @@ library(drcData)
 data(spinach)
 spinach$ldose <- log(spinach$DOSE + 0.005)
 
-plot(SLOPE ~ ldose, data=spinach)
-
-xm <- model.matrix(~ 0 + HERBICIDE, data=spinach)
-mm <- model.matrix(~ 1, data=spinach)
-lfct <- list(mm, mm, xm, xm, mm)
-
-
 mod <- bdrm(SLOPE ~ ldose, data=spinach,
             model=logistic(), 
-            linfct=lfct,
-            fixed=c(NA, NA, NA, NA, NA, NA, 1),
-            prior.mu=c(-10, 0, 2, 2, 0, 0, 1), 
-            prior.sd=c(10, 10, 10, 10, 1, 1, 0.5), 
-            upr=c(0, Inf, Inf, Inf, Inf, Inf, Inf),
-            lwr=c(-Inf, 0, 0, 0, -Inf, -Inf, 0),
+            linfct=c(~ 0 + HERBICIDE, ~1, ~ 0 + HERBICIDE, ~ 0 + HERBICIDE, ~ 0 + HERBICIDE),
+            fixed=c(NA, NA, 0, NA, NA, NA, NA, NA, NA),
+            prior.mu=c(-10, -10, 0, 2, 2, 0, 0, 1, 1), 
+            prior.sd=c(10, 10, 10, 10, 10, 1, 1, 0.5, 0.5), 
+            upr=c(0, 0, Inf, Inf, Inf, Inf, Inf, Inf, Inf),
+            lwr=c(-Inf, -Inf, 0, 0, 0, -Inf, -Inf, 0, 0),
             atau=0.001,
             btau=0.001,
             iter=15000, burnin=10000, adapt=20000)
 
-traceplot(mod, which=1:6)
+traceplot(mod, which=1:9)
+
+
+xc <- seq(-5, 5, length=100)
+
+pra <- apply(mod$psamples, c(1, 3), function(b) logistic()$fct(xc, b[c(1, 3, 4, 6, 8)]))
+qprma <- apply(pra, 1, quantile, probs=0.5)
+qpr1a <- apply(pra, 1, quantile, probs=0.025)
+qpr2a <- apply(pra, 1, quantile, probs=0.975)
+
+prb <- apply(mod$psamples, c(1, 3), function(b) logistic()$fct(xc, b[c(2, 3, 5, 7, 9)]))
+qprmb <- apply(prb, 1, quantile, probs=0.5)
+qpr1b <- apply(prb, 1, quantile, probs=0.025)
+qpr2b <- apply(prb, 1, quantile, probs=0.975)
+
+plot(SLOPE ~ ldose, data=spinach, col=c("red2", "blue2")[spinach$HERBICIDE])
+lines(xc, qprma, col="red2")
+lines(xc, qpr1a, lty=2, col="red2")
+lines(xc, qpr2a, lty=2, col="red2")
+lines(xc, qprmb, col="blue2")
+lines(xc, qpr1b, lty=2, col="blue2")
+lines(xc, qpr2b, lty=2, col="blue2")

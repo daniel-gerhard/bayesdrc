@@ -1,0 +1,9 @@
+export(bdrm, bdrm.fit, traceplot, postsamples)
+export(logistic)
+exportClasses("bdrm")
+
+import(stats, ggplot2, tidyr)
+importFrom("truncnorm", rtruncnorm, dtruncnorm)
+
+S3method(bdrm, formula)
+S3method(print, bdrm)

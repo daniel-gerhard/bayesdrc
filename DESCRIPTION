@@ -1,0 +1,13 @@
+Package: bayesdrc
+Title: Bayesian Dose-REsponse Models
+Date: 2020-02-21
+Version: 0.0-1
+Authors@R: c(person("Daniel", "Gerhard", role = c("aut", "cre"),
+		     email = "00gerhard@gmail.com"))
+Maintainer: Daniel Gerhard <00gerhard@gmail.com>
+Description: Fitting sigmoidal dose-response curves using MCMC.
+Depends: R (>= 3.1.0), stats, ggplot2, tidyr
+Imports: truncnorm
+LazyLoad: yes
+LazyData: yes
+License: GPL (>=2)
