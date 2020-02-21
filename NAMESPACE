@@ -1,4 +1,4 @@
-export(bdrm, bdrm.fit, traceplot, postsamples)
+export(bdrm, bdrmfit, traceplot, postsamples)
 export(logistic)
 exportClasses("bdrm")
 

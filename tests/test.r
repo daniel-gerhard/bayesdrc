@@ -3,6 +3,8 @@
 library(truncnorm)
 library(ggplot2)
 library(tidyr)
+#
+library(bayesdrc)
 
 ##################################
 
