@@ -1,5 +1,5 @@
 Package: bayesdrc
-Title: Bayesian Dose-REsponse Models
+Title: Bayesian Dose-Response Models
 Date: 2020-02-21
 Version: 0.0-1
 Authors@R: c(person("Daniel", "Gerhard", role = c("aut", "cre"),
@@ -11,3 +11,4 @@ Imports: truncnorm
 LazyLoad: yes
 LazyData: yes
 License: file LICENSE
+RoxygenNote: 7.0.2
