@@ -3,6 +3,8 @@
 #' Sampling from the posterior distribution of parameters of a sigmoidal dose-response curve. \code{bdrm} is comparable to function \code{drm} in the drc package, but there are slight differences between the user-interface and of course prior distributions need to be provided.
 #' 
 #' @param formula an object of class \code{"\link{formula}"} specifying the name of dose and response.
+#' @param x a vector with dose levels.
+#' @param y a vector with response values.
 #' @param data an optional data frame, list or environment (or object coercible by \code{\link{as.data.frame}} to a data frame) containing the variables in the model. If not found in \code{data}, the variables are taken from \code{environment(formula)}, typically the environment from which \code{bdrm} is called.
 #' @param model a bdrm model function, specifying the functional dose-response relationship.
 #' @param linfct either a list with a rhs \code{"\link{formula}"} for each of the parameters of the nonlinear dose-response function, conditioning on additional predictor variables, or a list of model matrices, see \code{"\link{model.matrix}"}. The default NULL assumes only an intercept for each of the parameters.

@@ -95,6 +95,10 @@ bdrmfit(
 \item{adapt}{number of samples in an adaptation phase.}
 
 \item{startval}{a vector with starting values for each parameter. If NULL, the starting values are sampled from the prior distributions.}
+
+\item{x}{a vector with dose levels.}
+
+\item{y}{a vector with response values.}
 }
 \value{
 An object of class \code{"bdrm"} is a list containing at least the following components:
