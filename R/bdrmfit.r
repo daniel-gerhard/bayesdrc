@@ -1,3 +1,4 @@
+#' @rdname bdrm
 bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){

@@ -48,6 +48,7 @@ bdrm <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL, upr=NU
   UseMethod("bdrm")
 }
 
+#' @rdname bdrm
 bdrm.formula <- function(formula, data, model, linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains=4, iter=10000, burnin=9000, adapt=10000, startval=NULL){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
