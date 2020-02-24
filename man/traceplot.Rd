@@ -4,12 +4,14 @@
 \alias{traceplot}
 \title{traceplot for bdrm objects}
 \usage{
-traceplot(x, which = 1:length(x$names))
+traceplot(x, which = 1:length(x$names), include_burnin = FALSE)
 }
 \arguments{
 \item{x}{an object of class bdrm.}
 
 \item{which}{index of the parameter of interest; default are all parameters.}
+
+\item{include_burnin}{should samples from the warmup phase be included.}
 }
 \value{
 a ggplot2 plot.

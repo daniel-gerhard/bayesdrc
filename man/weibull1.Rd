@@ -2,9 +2,12 @@
 % Please edit documentation in R/modelfunctions.r
 \name{weibull1}
 \alias{weibull1}
+\alias{weibull2}
 \title{Weibull Dose-Response Model}
 \usage{
 weibull1(names = c("b1", "b2", "b3", "b4"))
+
+weibull2(names = c("b1", "b2", "b3", "b4"))
 }
 \arguments{
 \item{names}{a vector with names for each model parameter}
@@ -24,6 +27,8 @@ Assuming a Weibull dose-response relationship in a bdrm model.
 }
 \details{
 The logistic function is defined as 
-\deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( \beta_1 (\log(x)-\log(\beta_4)))) }
+\deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4)))) }
+there exists a second parameterisation that is implemented in function \code{weibull2}
+\deqn{f(x, \beta) = \beta_2 + \beta_3 (1 - \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4))))) }
 }
 \keyword{models}

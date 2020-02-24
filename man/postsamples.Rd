@@ -4,12 +4,14 @@
 \alias{postsamples}
 \title{Extract posterior samples from a bdrm object}
 \usage{
-postsamples(x, which = 1:length(x$names))
+postsamples(x, which = 1:length(x$names), include_burnin = FALSE)
 }
 \arguments{
 \item{x}{an object of class bdrm.}
 
 \item{which}{index of the parameter of interest; default are all parameters.}
+
+\item{include_burnin}{should samples from the warmup phase be included.}
 }
 \value{
 a data.frame containing samples from the posterior distribution with columns: chain, iteration, parameter and sample.
