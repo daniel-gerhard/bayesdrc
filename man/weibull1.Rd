@@ -29,6 +29,6 @@ Assuming a Weibull dose-response relationship in a bdrm model.
 The logistic function is defined as 
 \deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4)))) }
 there exists a second parameterisation that is implemented in function \code{weibull2}
-\deqn{f(x, \beta) = \beta_2 + \beta_3 (1 - \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4))))) }
+\deqn{f(x, \beta) = \beta_2 + \beta_3 (1 - \exp(- \exp( \beta_1 (\log(x)-\log(\beta_4))))) }
 }
 \keyword{models}
