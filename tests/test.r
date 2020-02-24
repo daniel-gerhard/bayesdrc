@@ -39,6 +39,7 @@ mod1 <- bdrm(response ~ dose, data=test,
              iter=10000, burnin=8000, adapt=20000)
 
 
+
 mod2 <- bdrm(response ~ dose, data=test, 
              model=weibull1(), 
              fixed=c(NA, NA, NA, NA),

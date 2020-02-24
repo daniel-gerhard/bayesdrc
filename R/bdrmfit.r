@@ -113,5 +113,5 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
   }
   
   #### sampling
-  return(list(pm=pm[-(1:burnin),,], vm=vm[-(1:burnin),]))
+  return(list(pm=pm, vm=vm))
 }
