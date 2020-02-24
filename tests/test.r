@@ -15,19 +15,41 @@ test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1),
                    dose=dose)
 plot(response ~ dose, data=test)
 startval <- c(10, 0, 2, 0.5, 1)
-x <- test$dose
-y <- test$response
+
+###
+dose = seq(0, 1, length=25)
+model <- weibull1()
+mus <- c(10, 15, 2, 0.5)
+w1 <- function(x, beta) beta[2] + beta[3]*exp(-exp(-beta[1]*(log(x)-log(beta[4])))) 
+test <- data.frame(response = rnorm(length(dose), w1(dose, mus), 0.1), 
+                   dose=dose)
+plot(response ~ dose, data=test)
+startval <- c(10, 0, 2, 0.5)
 
 
-mod <- bdrm(response ~ dose, data=test, 
-            model=logistic(), 
-            fixed=c(NA, NA, NA, NA, 1),
-            lwr=c(0, -Inf, 0, 0, 0),
-            prior.mu=c(10, 15, 2, 0.5, 1), 
-            prior.sd=c(10, 10, 10, 1, 0.5), 
-            atau=0.001,
-            btau=0.001,
-            iter=10000, burnin=8000, adapt=20000)
+###############3
+mod1 <- bdrm(response ~ dose, data=test, 
+             model=logistic(), 
+             fixed=c(NA, NA, NA, NA, 1),
+             lwr=c(0, -Inf, 0, 0, 0),
+             prior.mu=c(10, 15, 2, 0.5, 1), 
+             prior.sd=c(10, 10, 10, 1, 0.5), 
+             atau=0.001,
+             btau=0.001,
+             iter=10000, burnin=8000, adapt=20000)
+
+
+mod2 <- bdrm(response ~ dose, data=test, 
+             model=weibull1(), 
+             fixed=c(NA, NA, NA, NA),
+             lwr=c(0, -Inf, 0, 0),
+             prior.mu=c(10, 15, 2, 0.5), 
+             prior.sd=c(10, 10, 10, 1), 
+             atau=0.001,
+             btau=0.001,
+             iter=10000, burnin=8000, adapt=20000)
+
+
 
 ################################################
 

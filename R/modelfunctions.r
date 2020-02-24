@@ -57,13 +57,13 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
 #' 
 #' @details 
 #' The logistic function is defined as 
-#' \deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( \beta_1 (\log(x)-\log(\beta_4)))) }
+#' \deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4)))) }
 #' 
 #' @keywords models
 
 weibull1 <- function(names=c("b1", "b2", "b3", "b4")){
   fct <- function(x, beta){
-    beta[2] + beta[3]*exp(-exp(beta[1]*(log(x)-log(beta[4]))))  
+    beta[2] + beta[3]*exp(-exp(-beta[1]*(log(x)-log(beta[4]))))  
   }
   loglik <- function(y, mu, variance){
     LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
