@@ -145,3 +145,44 @@ asyreg <- function(names=c("b1", "b2", "b3")){
   return(mod) 
 }
 
+
+#' Log-Normal Dose-Response Model
+#' 
+#' Assuming a log-normal dose-response relationship in a bdrm model.
+#' 
+#' @param names a vector with names for each model parameter
+#' 
+#' @return a list containing at least the following components:
+#' \describe{
+#'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
+#'   \item{loglik}{the log-likelihood function}
+#'   \item{ss}{sum-of-squares for observed and fitted values}
+#'   \item{p}{number of model parameters}
+#'   \item{names}{a vector with parameter names}
+#' }
+#' 
+#' @details 
+#' The log-normal model is defined as 
+#' \deqn{f(x, \beta) = \beta_2 + \beta_3 \Phi( \beta_1 (\log(x)-\beta_4)) }
+#' 
+#' @keywords models
+
+lognormal <- function(names=c("b1", "b2", "b3", "b4")){
+  fct <- function(x, beta){
+    beta[2] + beta[3]*pnorm(beta[1]*(log(x)-beta[4]))  
+  }
+  loglik <- function(y, mu, variance){
+    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
+    return(LL)
+  }
+  ss <- function(y, mu){
+    SS <- sum((y-mu)^2)
+    return(SS)
+  }
+  mod <- list(fct=fct, 
+              loglik=loglik, 
+              ss=ss, 
+              p=4,
+              names=names)
+  return(mod)
+}

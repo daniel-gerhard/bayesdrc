@@ -37,6 +37,16 @@ plot(response ~ dose, data=test)
 startval <- c(0, 10, 0.4)
 
 
+###
+dose = seq(0, 10, length=25)
+model <- lognormal()
+mus <- c(-1, 5, 10, 1)
+test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1), 
+                   dose=dose)
+plot(response ~ dose, data=test)
+startval <- c(10, 0, 2, 0.5)
+
+
 
 ###############3
 mod1 <- bdrm(response ~ dose, data=test, 
@@ -68,6 +78,17 @@ mod3 <- bdrm(response ~ dose, data=test,
              lwr=c(0, 0, 0),
              prior.mu=c(0, 10, 0.5), 
              prior.sd=c(10, 10, 5), 
+             atau=0.001,
+             btau=0.001,
+             iter=10000, burnin=8000, adapt=20000)
+
+
+mod4 <- bdrm(response ~ dose, data=test, 
+             model=lognormal(), 
+             fixed=c(NA, NA, NA, NA),
+             lwr=c(0, -Inf, 0, 0),
+             prior.mu=c(1, 5, 10, 0.5), 
+             prior.sd=c(10, 10, 10, 10), 
              atau=0.001,
              btau=0.001,
              iter=10000, burnin=8000, adapt=20000)
