@@ -1,5 +1,5 @@
 export(bdrm, bdrmfit, traceplot, postsamples)
-export(logistic, weibull1)
+export(logistic, weibull1, weibull2)
 exportClasses("bdrm")
 
 import(stats, ggplot2, tidyr)
