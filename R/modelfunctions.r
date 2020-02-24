@@ -103,3 +103,45 @@ weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
               names=names)
   return(mod)
 }
+
+#' Asymptotic Regression Model
+#' 
+#' Assuming an asymptotic regression model in bdrm
+#' 
+#' @param names a vector with names for each model parameter
+#' 
+#' @return a list containing at least the following components:
+#' \describe{
+#'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
+#'   \item{loglik}{the log-likelihood function}
+#'   \item{ss}{sum-of-squares for observed and fitted values}
+#'   \item{p}{number of model parameters}
+#'   \item{names}{a vector with parameter names}
+#' }
+#' 
+#' @details 
+#' The asymptotic regression model is defined as 
+#' \deqn{f(x, \beta) = \beta_1 + \beta_2 (1 - \exp(\frac{-x}{\beta_3})) }
+#' 
+#' @keywords models
+
+asyreg <- function(names=c("b1", "b2", "b3")){
+  fct <- function(x, beta){
+    beta[1] + beta[2]*(1 - exp(-x/beta[3]))  
+  }
+  loglik <- function(y, mu, variance){
+    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
+    return(LL)
+  }
+  ss <- function(y, mu){
+    SS <- sum((y-mu)^2)
+    return(SS)
+  }
+  mod <- list(fct=fct, 
+              loglik=loglik, 
+              ss=ss, 
+              p=3,
+              names=names)
+  return(mod) 
+}
+
