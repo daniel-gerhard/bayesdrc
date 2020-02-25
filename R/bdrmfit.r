@@ -9,6 +9,15 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
     pr <- apply(bx, 1, function(bb) model$fct(bb[1], bb[-1])) 
     return(pr)
   }
+  
+  loglik <- function(y, mu, variance){
+    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
+    return(LL)
+  }
+  ss <- function(y, mu){
+    SS <- sum((y-mu)^2)
+    return(SS)
+  }
 
   aiter <- adapt
   p <- length(attr(linfct, which="lfid"))
@@ -16,8 +25,6 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
   bsd <- prior.sd
   clwr <- lwr
   cupr <- upr
-  loglik <- model$loglik
-  ss <- model$ss
   jsd <- sqrt(bsd^2 * (2.4/sqrt(p))^2)
   # adaptive phase
   apm <- array(NA, dim=c(aiter, p, chains))

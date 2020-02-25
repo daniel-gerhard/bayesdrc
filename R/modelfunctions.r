@@ -7,8 +7,6 @@
 #' @return a list containing at least the following components:
 #' \describe{
 #'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
-#'   \item{loglik}{the log-likelihood function}
-#'   \item{ss}{sum-of-squares for observed and fitted values}
 #'   \item{p}{number of model parameters}
 #'   \item{names}{a vector with parameter names}
 #' }
@@ -23,17 +21,7 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
   fct <- function(x, beta){
     beta[2] + beta[3]/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
   }
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
-  }
-  ss <- function(y, mu){
-    SS <- sum((y-mu)^2)
-    return(SS)
-  }
   mod <- list(fct=fct, 
-              loglik=loglik, 
-              ss=ss, 
               p=5,
               names=names)
   return(mod)
@@ -49,8 +37,6 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
 #' @return a list containing at least the following components:
 #' \describe{
 #'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
-#'   \item{loglik}{the log-likelihood function}
-#'   \item{ss}{sum-of-squares for observed and fitted values}
 #'   \item{p}{number of model parameters}
 #'   \item{names}{a vector with parameter names}
 #' }
@@ -67,17 +53,7 @@ weibull1 <- function(names=c("b1", "b2", "b3", "b4")){
   fct <- function(x, beta){
     beta[2] + beta[3]*exp(-exp(-beta[1]*(log(x)-log(beta[4]))))  
   }
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
-  }
-  ss <- function(y, mu){
-    SS <- sum((y-mu)^2)
-    return(SS)
-  }
   mod <- list(fct=fct, 
-              loglik=loglik, 
-              ss=ss, 
               p=4,
               names=names)
   return(mod)
@@ -88,17 +64,7 @@ weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
   fct <- function(x, beta){
     beta[2] + beta[3]*(1 - exp(-exp(beta[1]*(log(x)-log(beta[4])))))  
   }
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
-  }
-  ss <- function(y, mu){
-    SS <- sum((y-mu)^2)
-    return(SS)
-  }
   mod <- list(fct=fct, 
-              loglik=loglik, 
-              ss=ss, 
               p=4,
               names=names)
   return(mod)
@@ -113,8 +79,6 @@ weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
 #' @return a list containing at least the following components:
 #' \describe{
 #'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
-#'   \item{loglik}{the log-likelihood function}
-#'   \item{ss}{sum-of-squares for observed and fitted values}
 #'   \item{p}{number of model parameters}
 #'   \item{names}{a vector with parameter names}
 #' }
@@ -129,17 +93,7 @@ asyreg <- function(names=c("b1", "b2", "b3")){
   fct <- function(x, beta){
     beta[1] + beta[2]*(1 - exp(-x/beta[3]))  
   }
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
-  }
-  ss <- function(y, mu){
-    SS <- sum((y-mu)^2)
-    return(SS)
-  }
   mod <- list(fct=fct, 
-              loglik=loglik, 
-              ss=ss, 
               p=3,
               names=names)
   return(mod) 
@@ -155,8 +109,6 @@ asyreg <- function(names=c("b1", "b2", "b3")){
 #' @return a list containing at least the following components:
 #' \describe{
 #'   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
-#'   \item{loglik}{the log-likelihood function}
-#'   \item{ss}{sum-of-squares for observed and fitted values}
 #'   \item{p}{number of model parameters}
 #'   \item{names}{a vector with parameter names}
 #' }
@@ -171,17 +123,7 @@ lognormal <- function(names=c("b1", "b2", "b3", "b4")){
   fct <- function(x, beta){
     beta[2] + beta[3]*pnorm(beta[1]*(log(x)-beta[4]))  
   }
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
-  }
-  ss <- function(y, mu){
-    SS <- sum((y-mu)^2)
-    return(SS)
-  }
   mod <- list(fct=fct, 
-              loglik=loglik, 
-              ss=ss, 
               p=4,
               names=names)
   return(mod)

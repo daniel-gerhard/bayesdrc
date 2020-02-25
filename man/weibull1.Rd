@@ -16,8 +16,6 @@ weibull2(names = c("b1", "b2", "b3", "b4"))
 a list containing at least the following components:
 \describe{
   \item{fct}{the logistic function with a dose x and a vector of parameters beta}
-  \item{loglik}{the log-likelihood function}
-  \item{ss}{sum-of-squares for observed and fitted values}
   \item{p}{number of model parameters}
   \item{names}{a vector with parameter names}
 }

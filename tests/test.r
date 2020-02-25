@@ -40,7 +40,7 @@ startval <- c(0, 10, 0.4)
 ###
 dose = seq(0, 10, length=25)
 model <- lognormal()
-mus <- c(-1, 5, 10, 1)
+mus <- c(1, 5, 10, 1)
 test <- data.frame(response = rnorm(length(dose), model$fct(dose, mus), 0.1), 
                    dose=dose)
 plot(response ~ dose, data=test)
