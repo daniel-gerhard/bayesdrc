@@ -1,5 +1,5 @@
 #' @rdname bdrm
-bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
+bdrmfit <- function(x, y, model, response, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){
     b <- sapply(1:length(linfct), function(i){
@@ -10,9 +10,17 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
     return(pr)
   }
   
-  loglik <- function(y, mu, variance){
-    LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
-    return(LL)
+  if (response == "gaussian"){ 
+    loglik <- function(y, mu, variance){
+      LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
+      return(LL)
+    }
+  }
+  if (response == "poisson"){ 
+    loglik <- function(y, mu, variance){
+      LL <- sum(dpois(y, mu, log=TRUE))
+      return(LL)
+    }
   }
   ss <- function(y, mu){
     SS <- sum((y-mu)^2)
@@ -76,8 +84,12 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
           }
         } 
       }
-      muo <- mufct(x, bo, model, linfct) 
-      avar[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
+      if (response == "gaussian"){
+        muo <- mufct(x, bo, model, linfct) 
+        avar[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
+      } else {
+        avar[i,k] <- 0
+      }
       apm[i,,k] <- bn
     }
   }
@@ -113,8 +125,12 @@ bdrmfit <- function(x, y, model, linfct, fixed, lwr, upr, prior.mu, prior.sd, at
           }
         }
       }
-      muo <- mufct(x, bo, model, linfct) 
-      av <- vm[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
+      if (response == "gaussian"){
+        muo <- mufct(x, bo, model, linfct) 
+        av <- vm[i,k] <- rgamma(1, atau + length(y)/2, btau + 0.5 * ss(y, muo))
+      } else {
+        av <- vm[i,k] <- 0
+      }
       pm[i,,k] <- bn
     }
   }

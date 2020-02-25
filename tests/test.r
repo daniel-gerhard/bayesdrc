@@ -94,6 +94,27 @@ mod4 <- bdrm(response ~ dose, data=test,
              iter=10000, burnin=8000, adapt=20000)
 
 
+##################################################################
+
+dose = seq(0, 1, length=25)
+model <- logistic()
+mus <- c(10, 15, 50, 0.5, 1)
+test <- data.frame(response = rpois(length(dose), model$fct(dose, mus)), 
+                   dose=dose)
+plot(response ~ dose, data=test)
+startval <- c(10, 0, 20, 0.5, 1)
+
+mod1 <- bdrm(response ~ dose, data=test, 
+             response="poisson",
+             model=logistic(), 
+             fixed=c(NA, NA, NA, NA, 1),
+             lwr=c(0, 0, 0, 0, 0),
+             prior.mu=c(10, 15, 50, 0.5, 1), 
+             prior.sd=c(10, 30, 30, 1, 0.5), 
+             atau=0.001,
+             btau=0.001,
+             iter=10000, burnin=8000, adapt=20000)
+
 
 
 ################################################

@@ -10,6 +10,7 @@ bdrm(
   formula,
   data,
   model,
+  response = "gaussian",
   linfct = NULL,
   fixed = NULL,
   lwr = NULL,
@@ -29,6 +30,7 @@ bdrm(
   formula,
   data,
   model,
+  response = "gaussian",
   linfct = NULL,
   fixed = NULL,
   lwr = NULL,
@@ -48,6 +50,7 @@ bdrmfit(
   x,
   y,
   model,
+  response,
   linfct,
   fixed,
   lwr,
@@ -69,6 +72,8 @@ bdrmfit(
 \item{data}{an optional data frame, list or environment (or object coercible by \code{\link{as.data.frame}} to a data frame) containing the variables in the model. If not found in \code{data}, the variables are taken from \code{environment(formula)}, typically the environment from which \code{bdrm} is called.}
 
 \item{model}{a bdrm model function, specifying the functional dose-response relationship.}
+
+\item{response}{the distribution of the response, either "gaussian" or "poisson"}
 
 \item{linfct}{either a list with a rhs \code{"\link{formula}"} for each of the parameters of the nonlinear dose-response function, conditioning on additional predictor variables, or a list of model matrices, see \code{"\link{model.matrix}"}. The default NULL assumes only an intercept for each of the parameters.}
 
@@ -104,6 +109,7 @@ bdrmfit(
 An object of class \code{"bdrm"} is a list containing at least the following components:
 \describe{
  \item{model}{a bdrm model object.}
+ \item{response}{distributional assumption about the response.}
  \item{linfct}{a list with model matrices.}
  \item{fixed}{a vector with fixed values for each of the model parameters.}
  \item{lwr}{a vector with lower bounds for each parameter.}
