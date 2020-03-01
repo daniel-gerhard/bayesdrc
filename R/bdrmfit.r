@@ -1,5 +1,5 @@
 #' @rdname bdrm
-bdrmfit <- function(x, y, model, response, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
+bdrmfit <- function(x, y, model, response, binomsize, linfct, fixed, lwr, upr, prior.mu, prior.sd, atau, btau, chains, iter, burnin, adapt, startval){
   # linfct mu fct
   mufct <- function(x, beta, model, linfct){
     b <- sapply(1:length(linfct), function(i){
@@ -11,14 +11,20 @@ bdrmfit <- function(x, y, model, response, linfct, fixed, lwr, upr, prior.mu, pr
   }
   
   if (response == "gaussian"){ 
-    loglik <- function(y, mu, variance){
+    loglik <- function(y, mu, variance, binomsize){
       LL <- sum(dnorm(y, mu, 1/sqrt(variance), log=TRUE))
       return(LL)
     }
   }
   if (response == "poisson"){ 
-    loglik <- function(y, mu, variance){
+    loglik <- function(y, mu, variance, binomsize){
       LL <- sum(dpois(y, mu, log=TRUE))
+      return(LL)
+    }
+  }
+  if (response == "binomial"){ 
+    loglik <- function(y, mu, variance, binomsize){
+      LL <- sum(dbinom(y, binomsize, mu, log=TRUE))
       return(LL)
     }
   }
@@ -59,8 +65,8 @@ bdrmfit <- function(x, y, model, response, linfct, fixed, lwr, upr, prior.mu, pr
           bn[j] <- rtruncnorm(1, a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])
           mun <- mufct(x, bn, model, linfct)
           muo <- mufct(x, bo, model, linfct)          
-          logR <- loglik(y, mun, av) - 
-            loglik(y, muo, av) +
+          logR <- loglik(y, mun, av, binomsize) - 
+            loglik(y, muo, av, binomsize) +
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) - 
             log(dtruncnorm(bo[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) -
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])) +
@@ -110,8 +116,8 @@ bdrmfit <- function(x, y, model, response, linfct, fixed, lwr, upr, prior.mu, pr
           bn[j] <- rtruncnorm(1, a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])
           mun <- mufct(x, bn, model, linfct)
           muo <- mufct(x, bo, model, linfct)              
-          logR <- loglik(y, mun, av) - 
-            loglik(y, muo, av) +
+          logR <- loglik(y, mun, av, binomsize) - 
+            loglik(y, muo, av, binomsize) +
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) - 
             log(dtruncnorm(bo[j], a=clwr[j], b=cupr[j], mean=bmu[j], sd=bsd[j])) -
             log(dtruncnorm(bn[j], a=clwr[j], b=cupr[j], mean=bo[j], sd=jsd[j])) +

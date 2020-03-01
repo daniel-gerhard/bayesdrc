@@ -4,10 +4,12 @@
 \alias{lognormal}
 \title{Log-Normal Dose-Response Model}
 \usage{
-lognormal(names = c("b1", "b2", "b3", "b4"))
+lognormal(names = c("b1", "b2", "b3", "b4"), sepasy = FALSE)
 }
 \arguments{
 \item{names}{a vector with names for each model parameter}
+
+\item{sepasy}{logical, should asymptotes be defined separately or as the difference between upper and lower final size}
 }
 \value{
 a list containing at least the following components:
@@ -23,5 +25,7 @@ Assuming a log-normal dose-response relationship in a bdrm model.
 \details{
 The log-normal model is defined as 
 \deqn{f(x, \beta) = \beta_2 + \beta_3 \Phi( \beta_1 (\log(x)-\beta_4)) }
+or if sepasy = FALSE as
+\deqn{f(x, \beta) = \beta_2 + (\beta_3 - \beta_2) \Phi( \beta_1 (\log(x)-\beta_4)) }
 }
 \keyword{models}

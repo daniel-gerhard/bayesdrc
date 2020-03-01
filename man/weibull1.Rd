@@ -5,12 +5,14 @@
 \alias{weibull2}
 \title{Weibull Dose-Response Model}
 \usage{
-weibull1(names = c("b1", "b2", "b3", "b4"))
+weibull1(names = c("b1", "b2", "b3", "b4"), sepasy = FALSE)
 
-weibull2(names = c("b1", "b2", "b3", "b4"))
+weibull2(names = c("b1", "b2", "b3", "b4"), sepasy = FALSE)
 }
 \arguments{
 \item{names}{a vector with names for each model parameter}
+
+\item{sepasy}{logical, should asymptotes be defined separately or as the difference between upper and lower final size}
 }
 \value{
 a list containing at least the following components:
@@ -28,5 +30,6 @@ The logistic function is defined as
 \deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4)))) }
 there exists a second parameterisation that is implemented in function \code{weibull2}
 \deqn{f(x, \beta) = \beta_2 + \beta_3 (1 - \exp(- \exp( \beta_1 (\log(x)-\log(\beta_4))))) }
+if sepasy == FALSE then $\beta_3$ is replaced with $(\beta_3 - \beta_2)$
 }
 \keyword{models}

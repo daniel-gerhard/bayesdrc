@@ -11,6 +11,7 @@ bdrm(
   data,
   model,
   response = "gaussian",
+  binomsize = NULL,
   linfct = NULL,
   fixed = NULL,
   lwr = NULL,
@@ -31,6 +32,7 @@ bdrm(
   data,
   model,
   response = "gaussian",
+  binomsize = NULL,
   linfct = NULL,
   fixed = NULL,
   lwr = NULL,
@@ -51,6 +53,7 @@ bdrmfit(
   y,
   model,
   response,
+  binomsize,
   linfct,
   fixed,
   lwr,
@@ -73,7 +76,9 @@ bdrmfit(
 
 \item{model}{a bdrm model function, specifying the functional dose-response relationship.}
 
-\item{response}{the distribution of the response, either "gaussian" or "poisson"}
+\item{response}{the distribution of the response, either "gaussian", "binomial" or "poisson"}
+
+\item{binomsize}{total number of events if response="binomial"}
 
 \item{linfct}{either a list with a rhs \code{"\link{formula}"} for each of the parameters of the nonlinear dose-response function, conditioning on additional predictor variables, or a list of model matrices, see \code{"\link{model.matrix}"}. The default NULL assumes only an intercept for each of the parameters.}
 

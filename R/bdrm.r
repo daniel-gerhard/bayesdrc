@@ -7,7 +7,8 @@
 #' @param y a vector with response values.
 #' @param data an optional data frame, list or environment (or object coercible by \code{\link{as.data.frame}} to a data frame) containing the variables in the model. If not found in \code{data}, the variables are taken from \code{environment(formula)}, typically the environment from which \code{bdrm} is called.
 #' @param model a bdrm model function, specifying the functional dose-response relationship.
-#' @param response the distribution of the response, either "gaussian" or "poisson"
+#' @param response the distribution of the response, either "gaussian", "binomial" or "poisson"
+#' @param binomsize total number of events if response="binomial"
 #' @param linfct either a list with a rhs \code{"\link{formula}"} for each of the parameters of the nonlinear dose-response function, conditioning on additional predictor variables, or a list of model matrices, see \code{"\link{model.matrix}"}. The default NULL assumes only an intercept for each of the parameters.
 #' @param fixed a vector with fixed values for each of the model parameters. When NA a prior distribution is assumed. The default NULL specifies NA for each of the parameters.
 #' @param lwr a vector with lower bounds for each parameter; NULL assumes -Inf for all parameters.
@@ -48,14 +49,15 @@
 #' 
 #' @keywords models
 
-bdrm <- function(formula, data, model, response="gaussian", linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains=4, iter=10000, burnin=9000, adapt=10000, startval=NULL){
+bdrm <- function(formula, data, model, response="gaussian", binomsize=NULL, linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains=4, iter=10000, burnin=9000, adapt=10000, startval=NULL){
   UseMethod("bdrm")
 }
 
 #' @rdname bdrm
-bdrm.formula <- function(formula, data, model, response="gaussian", linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains=4, iter=10000, burnin=9000, adapt=10000, startval=NULL){
+bdrm.formula <- function(formula, data, model, response="gaussian", binomsize=NULL, linfct=NULL, fixed=NULL, lwr=NULL, upr=NULL, prior.mu, prior.sd, atau=0.001, btau=0.001, chains=4, iter=10000, burnin=9000, adapt=10000, startval=NULL){
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
+  bsize <- as.character(mf[match("binomsize", names(mf))])
   m <- match(c("formula", "data", "subset", "weights", "na.action", "offset"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- TRUE
@@ -64,6 +66,13 @@ bdrm.formula <- function(formula, data, model, response="gaussian", linfct=NULL,
   mt <- attr(mf, "terms")
   y <- model.response(mf, "numeric")
   x <- model.matrix(mt, mf)[,-1]
+  
+  if (bsize == "NULL"){
+    binomsize <- NULL
+  } else {
+    binomsize <- data[,bsize] 
+  }
+  
   
   if (is.null(fixed)) fixed <- rep(NA, model$p)
   if (is.null(lwr)) lwr <- rep(-Inf, model$p)
@@ -75,7 +84,7 @@ bdrm.formula <- function(formula, data, model, response="gaussian", linfct=NULL,
   attr(linfct, which="lfid") <- rep(1:model$p, lapply(linfct, ncol))
   attr(linfct, which="name") <- paste(model$names[attr(linfct, which="lfid")], unlist(sapply(linfct, colnames)), sep=":")
   
-  postsamp <- bdrmfit(x, y, model=model, response=response, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, burnin=burnin, adapt=adapt, startval=startval)
+  postsamp <- bdrmfit(x, y, model=model, response=response, binomsize=binomsize, linfct=linfct, fixed=fixed, lwr=lwr, upr=upr, prior.mu=prior.mu, prior.sd=prior.sd, atau=atau, btau=btau, chains=chains, iter=iter, burnin=burnin, adapt=adapt, startval=startval)
   
   dimnames(postsamp$pm)[[2]] <- attr(linfct, which="name")
   dimnames(postsamp$pm)[[3]] <- paste("chain", 1:chains, sep="")

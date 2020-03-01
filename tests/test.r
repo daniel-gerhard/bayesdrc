@@ -141,25 +141,14 @@ mod <- bdrm(y ~ x, data=rt,
 
 pm <- mod$psamples
 
-library(coda)
-dim(pm)
-pml <- lapply(1:4, function(i) as.mcmc(pm[,,i]))
-mcl <- as.mcmc.list(pml)
-summary(mcl)
-#plot(mcl)
-gelman.diag(mcl, autoburnin=FALSE, multivariate=FALSE)
-
-
 xc <- seq(-2, 4, length=100)
-yc <- logistic()$fct(xc, summary(mcl)$statistics[,1])
-par(mfrow=c(1,1))
-plot(x, y)
 
 pr <- apply(pm, c(1, 3), function(b) logistic()$fct(xc, b))
 qprm <- apply(pr, 1, quantile, probs=0.5)
 qpr1 <- apply(pr, 1, quantile, probs=0.025)
 qpr2 <- apply(pr, 1, quantile, probs=0.975)
 
+plot(x, y)
 lines(xc, qprm)
 lines(xc, qpr1, lty=2)
 lines(xc, qpr2, lty=2)
@@ -205,3 +194,46 @@ lines(xc, qpr2a, lty=2, col="red2")
 lines(xc, qprmb, col="blue2")
 lines(xc, qpr1b, lty=2, col="blue2")
 lines(xc, qpr2b, lty=2, col="blue2")
+
+
+#########################################
+data(C.dubia)
+plot(number ~ conc, data=C.dubia)
+
+
+
+####################
+library(drcData)
+data(earthworms)
+earthworms$ldose <- earthworms$dose 
+earthworms$ldose[earthworms$ldose == 0] <- 0.1
+earthworms$ldose <- log(earthworms$ldose)
+
+plot(number/total ~ ldose, data=earthworms)
+
+mod <- bdrm(number ~ ldose, data=earthworms, 
+            model=logistic(sepasy=TRUE), 
+            response="binomial",
+            binomsize=total,
+            fixed=c(NA, NA, NA, NA, 1),
+            prior.mu=c(-10, 0.6, 0, 1, 1), 
+            prior.sd=c(10, 10, 10, 1, 0.5), 
+            upr=c(0, 1, 1, Inf, Inf),
+            lwr=c(-Inf, 0, 0, -Inf, 0),
+            atau=0.001,
+            btau=0.001,
+            iter=15000, burnin=10000, adapt=20000)
+
+pm <- mod$psamples
+
+xc <- seq(-3, 3, length=100)
+
+pr <- apply(pm, c(1, 3), function(b) logistic()$fct(xc, b))
+qprm <- apply(pr, 1, quantile, probs=0.5)
+qpr1 <- apply(pr, 1, quantile, probs=0.025)
+qpr2 <- apply(pr, 1, quantile, probs=0.975)
+
+plot(number/total ~ ldose, data=earthworms, ylim=c(0, 2))
+lines(xc, qprm)
+lines(xc, qpr1, lty=2)
+lines(xc, qpr2, lty=2)

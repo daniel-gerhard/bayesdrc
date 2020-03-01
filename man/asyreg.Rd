@@ -4,10 +4,12 @@
 \alias{asyreg}
 \title{Asymptotic Regression Model}
 \usage{
-asyreg(names = c("b1", "b2", "b3"))
+asyreg(names = c("b1", "b2", "b3"), sepasy = FALSE)
 }
 \arguments{
 \item{names}{a vector with names for each model parameter}
+
+\item{sepasy}{logical, should asymptotes be defined separately or as the difference between upper and lower final size}
 }
 \value{
 a list containing at least the following components:
@@ -23,5 +25,7 @@ Assuming an asymptotic regression model in bdrm
 \details{
 The asymptotic regression model is defined as 
 \deqn{f(x, \beta) = \beta_1 + \beta_2 (1 - \exp(\frac{-x}{\beta_3})) }
+or if sepasy=TRUE as
+\deqn{f(x, \beta) = \beta_1 + (\beta_2 - beta_1) (1 - \exp(\frac{-x}{\beta_3})) }
 }
 \keyword{models}

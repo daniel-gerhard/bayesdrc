@@ -3,6 +3,7 @@
 #' Assuming a logistic dose-response relationship in a bdrm model.
 #' 
 #' @param names a vector with names for each model parameter
+#' @param sepasy logical, should asymptotes be defined separately or as the difference between upper and lower final size
 #' 
 #' @return a list containing at least the following components:
 #' \describe{
@@ -14,12 +15,20 @@
 #' @details 
 #' The logistic function is defined as 
 #' \deqn{f(x, \beta) = \beta_2 + \frac{\beta_3}{(1 + \exp(-\beta_1 (x-\beta_4))^{\beta_5})}}
+#' or if sepasy==TRUE as
+#' \deqn{f(x, \beta) = \beta_2 + \frac{\beta_3 - \beta_2}{(1 + \exp(-\beta_1 (x-\beta_4))^{\beta_5})}}
 #' 
 #' @keywords models
 
-logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
-  fct <- function(x, beta){
-    beta[2] + beta[3]/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
+logistic <- function(names=c("b1", "b2", "b3", "b4", "b5"), sepasy=FALSE){
+  if (sepasy == FALSE){
+    fct <- function(x, beta){
+      beta[2] + beta[3]/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
+    }
+  } else {
+    fct <- function(x, beta){
+      beta[2] + (beta[3]-beta[2])/(1 + exp(-beta[1]*(x-beta[4]))^beta[5])  
+    }    
   }
   mod <- list(fct=fct, 
               p=5,
@@ -33,6 +42,7 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
 #' Assuming a Weibull dose-response relationship in a bdrm model.
 #' 
 #' @param names a vector with names for each model parameter
+#' @param sepasy logical, should asymptotes be defined separately or as the difference between upper and lower final size
 #' 
 #' @return a list containing at least the following components:
 #' \describe{
@@ -46,12 +56,19 @@ logistic <- function(names=c("b1", "b2", "b3", "b4", "b5")){
 #' \deqn{f(x, \beta) = \beta_2 + \beta_3 \exp(- \exp( -\beta_1 (\log(x)-\log(\beta_4)))) }
 #' there exists a second parameterisation that is implemented in function \code{weibull2}
 #' \deqn{f(x, \beta) = \beta_2 + \beta_3 (1 - \exp(- \exp( \beta_1 (\log(x)-\log(\beta_4))))) }
+#' if sepasy == FALSE then $\beta_3$ is replaced with $(\beta_3 - \beta_2)$
 #' 
 #' @keywords models
 
-weibull1 <- function(names=c("b1", "b2", "b3", "b4")){
-  fct <- function(x, beta){
-    beta[2] + beta[3]*exp(-exp(-beta[1]*(log(x)-log(beta[4]))))  
+weibull1 <- function(names=c("b1", "b2", "b3", "b4"), sepasy=FALSE){
+  if (sepasy == FALSE){
+    fct <- function(x, beta){
+      beta[2] + beta[3]*exp(-exp(-beta[1]*(log(x)-log(beta[4]))))  
+    }
+  } else {
+    fct <- function(x, beta){
+      beta[2] + (beta[3]-beta[2])*exp(-exp(-beta[1]*(log(x)-log(beta[4]))))  
+    }    
   }
   mod <- list(fct=fct, 
               p=4,
@@ -60,9 +77,15 @@ weibull1 <- function(names=c("b1", "b2", "b3", "b4")){
 }
 
 #' @rdname weibull1
-weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
-  fct <- function(x, beta){
-    beta[2] + beta[3]*(1 - exp(-exp(beta[1]*(log(x)-log(beta[4])))))  
+weibull2 <- function(names=c("b1", "b2", "b3", "b4"), sepasy=FALSE){
+  if (sepasy == FALSE){
+    fct <- function(x, beta){
+      beta[2] + beta[3]*(1 - exp(-exp(beta[1]*(log(x)-log(beta[4])))))  
+    }
+  } else {
+    fct <- function(x, beta){
+      beta[2] + (beta[3]-beta[2])*(1 - exp(-exp(beta[1]*(log(x)-log(beta[4])))))  
+    }    
   }
   mod <- list(fct=fct, 
               p=4,
@@ -75,6 +98,7 @@ weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
 #' Assuming an asymptotic regression model in bdrm
 #' 
 #' @param names a vector with names for each model parameter
+#' @param sepasy logical, should asymptotes be defined separately or as the difference between upper and lower final size
 #' 
 #' @return a list containing at least the following components:
 #' \describe{
@@ -86,12 +110,20 @@ weibull2 <- function(names=c("b1", "b2", "b3", "b4")){
 #' @details 
 #' The asymptotic regression model is defined as 
 #' \deqn{f(x, \beta) = \beta_1 + \beta_2 (1 - \exp(\frac{-x}{\beta_3})) }
+#' or if sepasy=TRUE as
+#' \deqn{f(x, \beta) = \beta_1 + (\beta_2 - beta_1) (1 - \exp(\frac{-x}{\beta_3})) }
 #' 
 #' @keywords models
 
-asyreg <- function(names=c("b1", "b2", "b3")){
-  fct <- function(x, beta){
-    beta[1] + beta[2]*(1 - exp(-x/beta[3]))  
+asyreg <- function(names=c("b1", "b2", "b3"), sepasy=FALSE){
+  if (sepasy == FALSE){
+    fct <- function(x, beta){
+      beta[1] + beta[2]*(1 - exp(-x/beta[3]))  
+    }
+  } else {
+    fct <- function(x, beta){
+      beta[1] + (beta[2]-beta[1])*(1 - exp(-x/beta[3]))  
+    }    
   }
   mod <- list(fct=fct, 
               p=3,
@@ -105,6 +137,7 @@ asyreg <- function(names=c("b1", "b2", "b3")){
 #' Assuming a log-normal dose-response relationship in a bdrm model.
 #' 
 #' @param names a vector with names for each model parameter
+#' @param sepasy logical, should asymptotes be defined separately or as the difference between upper and lower final size
 #' 
 #' @return a list containing at least the following components:
 #' \describe{
@@ -116,12 +149,20 @@ asyreg <- function(names=c("b1", "b2", "b3")){
 #' @details 
 #' The log-normal model is defined as 
 #' \deqn{f(x, \beta) = \beta_2 + \beta_3 \Phi( \beta_1 (\log(x)-\beta_4)) }
+#' or if sepasy = FALSE as
+#' \deqn{f(x, \beta) = \beta_2 + (\beta_3 - \beta_2) \Phi( \beta_1 (\log(x)-\beta_4)) }
 #' 
 #' @keywords models
 
-lognormal <- function(names=c("b1", "b2", "b3", "b4")){
-  fct <- function(x, beta){
-    beta[2] + beta[3]*pnorm(beta[1]*(log(x)-beta[4]))  
+lognormal <- function(names=c("b1", "b2", "b3", "b4"), sepasy=FALSE){
+  if (sepasy == FALSE){
+    fct <- function(x, beta){
+      beta[2] + beta[3]*pnorm(beta[1]*(log(x)-beta[4]))  
+    }
+  } else {
+    fct <- function(x, beta){
+      beta[2] + (beta[3] - beta[2])*pnorm(beta[1]*(log(x)-beta[4]))  
+    }   
   }
   mod <- list(fct=fct, 
               p=4,

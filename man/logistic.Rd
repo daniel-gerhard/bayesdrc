@@ -4,10 +4,12 @@
 \alias{logistic}
 \title{Logistic Dose-Response Model}
 \usage{
-logistic(names = c("b1", "b2", "b3", "b4", "b5"))
+logistic(names = c("b1", "b2", "b3", "b4", "b5"), sepasy = FALSE)
 }
 \arguments{
 \item{names}{a vector with names for each model parameter}
+
+\item{sepasy}{logical, should asymptotes be defined separately or as the difference between upper and lower final size}
 }
 \value{
 a list containing at least the following components:
@@ -23,5 +25,7 @@ Assuming a logistic dose-response relationship in a bdrm model.
 \details{
 The logistic function is defined as 
 \deqn{f(x, \beta) = \beta_2 + \frac{\beta_3}{(1 + \exp(-\beta_1 (x-\beta_4))^{\beta_5})}}
+or if sepasy==TRUE as
+\deqn{f(x, \beta) = \beta_2 + \frac{\beta_3 - \beta_2}{(1 + \exp(-\beta_1 (x-\beta_4))^{\beta_5})}}
 }
 \keyword{models}
